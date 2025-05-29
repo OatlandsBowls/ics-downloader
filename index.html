@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <script>
+    window.addEventListener("message", (event) => {
+      const icsContent = event.data;
+
+      const blob = new Blob([icsContent], { type: "text/calendar" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "calendar.ics";
+
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
