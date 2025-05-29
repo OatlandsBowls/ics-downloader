@@ -1,37 +1,30 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>ICS Downloader</title>
-</head>
-<body>
-  <p>Waiting for ICS data...</p>
-
-  <script>
-    window.addEventListener("message", (event) => {
-      const icsContent = event.data;
-
-      if (typeof icsContent !== "string" || !icsContent.startsWith("BEGIN:VCALENDAR")) {
-        console.warn("Invalid ICS content received:", icsContent);
-        return;
+  <body>
+    <p>Downloading calendar file...</p>
+    <script>
+      function getQueryParam(name) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(name);
       }
 
-      console.log("Received ICS content:", icsContent);
-      document.body.innerHTML = "<p>Received ICS file. Triggering download...</p>";
+      const icsContent = decodeURIComponent(getQueryParam("ics") || "");
 
-      const blob = new Blob([icsContent], { type: "text/calendar" });
-      const url = URL.createObjectURL(blob);
+      if (icsContent) {
+        const blob = new Blob([icsContent], { type: "text/calendar" });
+        const url = URL.createObjectURL(blob);
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "calendar.ics";
-      a.style.display = "none";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "calendar.ics";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
 
-      URL.revokeObjectURL(url);
-    });
-  </script>
-</body>
+        URL.revokeObjectURL(url);
+      } else {
+        document.body.innerHTML = "<p>No ICS content found.</p>";
+      }
+    </script>
+  </body>
 </html>
