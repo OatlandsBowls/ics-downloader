@@ -1,9 +1,23 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="UTF-8">
+  <title>ICS Downloader</title>
+</head>
 <body>
+  <p>Waiting for ICS data...</p>
+
   <script>
     window.addEventListener("message", (event) => {
       const icsContent = event.data;
+
+      if (typeof icsContent !== "string" || !icsContent.startsWith("BEGIN:VCALENDAR")) {
+        console.warn("Invalid ICS content received:", icsContent);
+        return;
+      }
+
+      console.log("Received ICS content:", icsContent);
+      document.body.innerHTML = "<p>Received ICS file. Triggering download...</p>";
 
       const blob = new Blob([icsContent], { type: "text/calendar" });
       const url = URL.createObjectURL(blob);
@@ -11,7 +25,7 @@
       const a = document.createElement("a");
       a.href = url;
       a.download = "calendar.ics";
-
+      a.style.display = "none";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
