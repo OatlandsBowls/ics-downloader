@@ -2,16 +2,12 @@
 <html>
   <body>
     <script>
-      // Log when iframe loads
-      console.log("Iframe loaded, waiting for message...");
+      window.onload = function () {
+        const params = new URLSearchParams(window.location.search);
+        const ics = params.get("ics");
 
-      window.addEventListener("message", function(event) {
-        console.log("Received message:", event.data);
-
-        const icsContent = event.data;
-
-        if (typeof icsContent === "string" && icsContent.includes("BEGIN:VCALENDAR")) {
-          const blob = new Blob([icsContent], { type: "text/calendar" });
+        if (ics && ics.startsWith("BEGIN:VCALENDAR")) {
+          const blob = new Blob([ics], { type: "text/calendar" });
           const url = URL.createObjectURL(blob);
 
           const a = document.createElement("a");
@@ -20,13 +16,15 @@
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
-          console.log("ICS download triggered.");
+          URL.revokeObjectURL(url);
+
+          document.body.innerHTML = "<h2>ICS download triggered.</h2>";
         } else {
-          console.warn("Invalid ICS data received.");
           document.body.innerHTML = "<h2>No valid ICS data received.</h2>";
         }
-      });
+      };
     </script>
-    <h3>Ready to receive ICS data...</h3>
+    <h3>Preparing download...</h3>
   </body>
 </html>
+
